@@ -1,32 +1,34 @@
-name: 网页连续截图
+name: Edge浏览器网页连续截图
+
 on:
-  workflow_dispatch:  # 支持手动触发（在 GitHub 仓库的 Actions 页面点击运行）
-  # schedule:  # 可选：定时触发（如每天9点执行，需用 UTC 时间）
-  #   - cron: '0 1 * * *'
+  workflow_dispatch:  # 支持手动触发（在GitHub仓库的Actions页面点击运行）
+  # schedule:  # 可选：定时触发
+  #   - cron: '0 * * * *'  # 每小时执行一次
 
 jobs:
   screenshot:
-    runs-on: ubuntu-latest  # 使用 Ubuntu  runner
+    runs-on: windows-latest  # **关键：必须使用Windows环境运行Edge**
     steps:
       - name: 拉取代码
         uses: actions/checkout@v4
 
-      - name: 安装 Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'  # 指定 Python 版本
-
-      - name: 安装 Playwright 及浏览器
+      - name: 安装Python和依赖
         run: |
+          python --version
           pip install playwright
-          playwright install chromium  # 安装 Chromium 浏览器
+
+      - name: 安装Edge浏览器（如果系统没有预装）
+        uses: browser-actions/setup-edge@v1  # 可选：确保Edge可用
+
+      - name: 安装Playwright的Edge驱动
+        run: playwright install msedge
 
       - name: 执行截图脚本
-        run: python screenshot_script.py
+        run: python edge-screenshot.py
 
-      - name: 保存截图（可选，方便下载）
+      - name: 保存截图结果（方便下载查看）
         uses: actions/upload-artifact@v4
         with:
-          name: webpage-screenshots  # 压缩包名称
-          path: "*.png"  # 上传所有 PNG 截图
+          name: edge-web-screenshots
+          path: "edge-screenshot-*.png"
 

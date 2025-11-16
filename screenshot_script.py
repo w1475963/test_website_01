@@ -4,39 +4,40 @@ import time
 from playwright.sync_api import sync_playwright
 
 
-def take_anti_bot_screenshots(url, count=5, interval=5):
+def take_edge_screenshots(url, count=5, interval=5):
     with sync_playwright() as p:
-        # 1. 浏览器配置：伪装真实Chrome，消除无头特征
         browser = p.chromium.launch(
-            headless=True,  # 保持无头（效率高），但优化参数
+            channel="msedge",  # 使用Edge浏览器
+            headless=True,  # 无头模式（后台运行）
             args=[
-                "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",  # 真实Chrome User-Agent
-                "--window-size=1920,1080",  # 模拟桌面窗口尺寸
-                "--disable-blink-features=AutomationControlled",  # 关键：禁用“自动化控制”标识（规避检测）
-                "--no-sandbox",  # GitHub Runner 需此参数（无沙箱环境）
-                "--disable-dev-shm-usage",  # 解决内存不足问题
+                # Edge专用User-Agent
+                "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edge/120.0.0.0",
+                "--window-size=1920,1080",  # 桌面窗口尺寸
+                "--disable-blink-features=AutomationControlled",  # 消除自动化检测特征
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
             ],
         )
+
         page = browser.new_page()
-        # 2. 额外伪装：设置视口（与窗口尺寸一致）
         page.set_viewport_size({"width": 1920, "height": 1080})
 
-        # 3. 打开网页：模拟真实加载（等待页面完全渲染）
-        page.goto(url, wait_until="domcontentloaded")  # 等待DOM加载，而非仅网络空闲
-        time.sleep(random.uniform(2, 4))  # 随机等待2-4秒（避免机械等待）
+        # 打开网页并模拟真实用户行为（增加抗检测能力）
+        page.goto(url, wait_until="domcontentloaded")  # 等待内容加载
+        time.sleep(random.uniform(2, 4))  # 随机等待（避免固定间隔）
 
-        # # 4. 模拟用户行为：滚动页面（模拟浏览）
-        # page.mouse.wheel(0, random.randint(300, 800))  # 向下滚动300-800像素
-        # time.sleep(random.uniform(1, 2))  # 滚动后停顿
+        # 模拟用户浏览：随机滚动页面
+        for _ in range(random.randint(1, 3)):
+            page.mouse.wheel(0, random.randint(300, 800))  # 随机滚动
+            time.sleep(random.uniform(1, 1.5))
 
-        # 5. 循环截图（保留间隔，增加随机波动）
+        # 连续截图（间隔5秒+随机波动）
         for i in range(count):
-            # 截图（可选：指定区域，更像用户截图习惯）
-            screenshot_path = f"screenshot_{i + 1}.png"
-            page.screenshot(path=screenshot_path, full_page=True)
+            screenshot_path = f"edge-screenshot-{i + 1}.png"
+            page.screenshot(path=screenshot_path, full_page=True)  # 截全屏
             print(f"已保存截图：{screenshot_path}")
 
-            # 间隔：基础5秒 + 0-1秒随机波动（避免固定间隔被识别）
+            # 间隔（基础5秒 + 0-1秒随机波动，避免固定间隔被检测）
             if i < count - 1:
                 time.sleep(interval + random.uniform(0, 1))
 
@@ -44,4 +45,8 @@ def take_anti_bot_screenshots(url, count=5, interval=5):
 
 
 # 调用：替换为目标URL
-take_anti_bot_screenshots(url="https://the-learning-room.netlify.app/welcome/video_welcome", count=5, interval=10)
+take_anti_bot_screenshots(
+    url="https://the-learning-room.netlify.app",
+    count=10,
+    interval=5,
+)
