@@ -38,8 +38,8 @@ def take_screenshots(url, count=5, interval=5):
             print(f"saved screenshot:{screenshot_path}")
 
             # 间隔（基础5秒 + 0-1秒随机波动，避免固定间隔被检测）
-            # if i < count - 1:
-            #     time.sleep(interval + random.uniform(0, 1))
+            if i < count - 1:
+                time.sleep(interval + random.uniform(0, 1))
 
         browser.close()
 
