@@ -1,13 +1,13 @@
 name: Edge浏览器网页连续截图
 
 on:
-  workflow_dispatch:  # 支持手动触发（在GitHub仓库的Actions页面点击运行）
-  # schedule:  # 可选：定时触发
-  #   - cron: '0 * * * *'  # 每小时执行一次
+  workflow_dispatch:  # 手动触发
+  # schedule:  # 可选定时触发
+  #   - cron: '0 * * * *'
 
 jobs:
   screenshot:
-    runs-on: windows-latest  # **关键：必须使用Windows环境运行Edge**
+    runs-on: windows-latest  # 必须用Windows环境
     steps:
       - name: 拉取代码
         uses: actions/checkout@v4
@@ -17,16 +17,13 @@ jobs:
           python --version
           pip install playwright
 
-      - name: 安装Edge浏览器（如果系统没有预装）
-        uses: browser-actions/setup-edge@v1  # 可选：确保Edge可用
-
-      - name: 安装Playwright的Edge驱动
+      - name: 安装Playwright的Edge驱动（关键：关联已装的Edge）
         run: playwright install msedge
 
       - name: 执行截图脚本
         run: python edge-screenshot.py
 
-      - name: 保存截图结果（方便下载查看）
+      - name: 保存截图结果
         uses: actions/upload-artifact@v4
         with:
           name: edge-web-screenshots
