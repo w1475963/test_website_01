@@ -4,7 +4,7 @@ import time
 from playwright.sync_api import sync_playwright
 
 
-def take_edge_screenshots(url, count=5, interval=5):
+def take_screenshots(url, count=5, interval=5):
     with sync_playwright() as p:
         browser = p.chromium.launch(
             channel="msedge",  # 使用Edge浏览器
@@ -27,9 +27,9 @@ def take_edge_screenshots(url, count=5, interval=5):
         time.sleep(random.uniform(2, 4))  # 随机等待（避免固定间隔）
 
         # 模拟用户浏览：随机滚动页面
-        for _ in range(random.randint(1, 3)):
-            page.mouse.wheel(0, random.randint(300, 800))  # 随机滚动
-            time.sleep(random.uniform(1, 1.5))
+        # for _ in range(random.randint(1, 3)):
+        #     page.mouse.wheel(0, random.randint(300, 800))  # 随机滚动
+        #     time.sleep(random.uniform(1, 1.5))
 
         # 连续截图（间隔5秒+随机波动）
         for i in range(count):
@@ -38,14 +38,14 @@ def take_edge_screenshots(url, count=5, interval=5):
             print(f"已保存截图：{screenshot_path}")
 
             # 间隔（基础5秒 + 0-1秒随机波动，避免固定间隔被检测）
-            if i < count - 1:
-                time.sleep(interval + random.uniform(0, 1))
+            # if i < count - 1:
+            #     time.sleep(interval + random.uniform(0, 1))
 
         browser.close()
 
 
 # 调用：替换为目标URL
-take_anti_bot_screenshots(
+take_screenshots(
     url="https://the-learning-room.netlify.app",
     count=10,
     interval=5,
