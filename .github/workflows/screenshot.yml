@@ -1,0 +1,32 @@
+name: 网页连续截图
+on:
+  workflow_dispatch:  # 支持手动触发（在 GitHub 仓库的 Actions 页面点击运行）
+  # schedule:  # 可选：定时触发（如每天9点执行，需用 UTC 时间）
+  #   - cron: '0 1 * * *'
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest  # 使用 Ubuntu  runner
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'  # 指定 Python 版本
+
+      - name: 安装 Playwright 及浏览器
+        run: |
+          pip install playwright
+          playwright install chromium  # 安装 Chromium 浏览器
+
+      - name: 执行截图脚本
+        run: python screenshot_script.py
+
+      - name: 保存截图（可选，方便下载）
+        uses: actions/upload-artifact@v4
+        with:
+          name: webpage-screenshots  # 压缩包名称
+          path: "*.png"  # 上传所有 PNG 截图
+
