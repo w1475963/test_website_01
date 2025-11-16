@@ -35,7 +35,7 @@ def take_screenshots(url, count=5, interval=5):
         for i in range(count):
             screenshot_path = f"edge-screenshot-{i + 1}.png"
             page.screenshot(path=screenshot_path, full_page=True)  # 截全屏
-            print(f"已保存截图：{screenshot_path}")
+            print(f"saved screenshot:{screenshot_path}")
 
             # 间隔（基础5秒 + 0-1秒随机波动，避免固定间隔被检测）
             # if i < count - 1:
